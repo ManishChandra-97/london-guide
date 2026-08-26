@@ -101,8 +101,56 @@ const timeOutBars = [
 items.push(...timeOutBars);
 const timeOutRatings = { 'cafe-kick':'5/5',jumbi:'5/5','ellies-dalston':'4/5','umbrella-workshop':'5/5','waltz-shoreditch':'5/5','big-johns-biltong-bar':'5/5','tramps-bar':'5/5','rasputins-hackney':'4/5','bonne-route':'4/5','equal-parts':'5/5','endeavour-deptford':'5/5','lower-wine-bar':'5/5','roses-of-elagabalus':'4/5','cafe-1001':'4/5' };
 items.forEach(item => { if(item.source === 'Time Out') { item.rating = item.rating || `Time Out · ${timeOutRatings[item.id] || 'Not rated'}`; item.summary += ` Time Out rating: ${item.rating.replace('Time Out · ','')}.`; } });
+const touristSources = {
+  londonMyMind: ['London On My Mind','https://londonmymind.com/must-see-london/'],
+  tripadvisor: ['Tripadvisor','https://www.tripadvisor.co.uk/Attractions-g186338-Activities-London_England.html'],
+  visitLondon: ['Visit London','https://www.visitlondon.com/']
+};
+const touristDestinations = [
+  ['palace-of-westminster','Palace of Westminster & Big Ben','Westminster','Parliament Square, SW1A 0AA',51.4995,-0.1248,'Gothic riverside landmark, home to Parliament and the Elizabeth Tower.', 'londonMyMind',['art-culture']],
+  ['westminster-abbey','Westminster Abbey','Westminster','Dean’s Yard, SW1P 3PA',51.4993,-0.1273,'Historic coronation church with royal tombs, memorials and Gothic architecture.', 'tripadvisor',['art-culture']],
+  ['the-shard','The Shard','London Bridge','32 London Bridge Street, SE1 9SG',51.5045,-0.0865,'London’s tallest viewing platform, with wide skyline views from the upper floors.', 'londonMyMind',['experience']],
+  ['tower-bridge','Tower Bridge','Tower Bridge','Tower Bridge Road, SE1 2UP',51.5055,-0.0754,'Victorian bascule bridge with high-level walkways and an engine-room exhibition.', 'tripadvisor',['art-culture']],
+  ['tower-of-london','Tower of London','Tower Hill','EC3N 4AB',51.5081,-0.0761,'Historic royal fortress and home of the Crown Jewels.', 'tripadvisor',['art-culture','family-kids']],
+  ['london-wall','London Wall','City of London','London Wall, EC2Y',51.5161,-0.0906,'Surviving fragments of the Roman wall that once enclosed the City of London.', 'londonMyMind',['art-culture']],
+  ['the-monument','The Monument to the Great Fire of London','City of London','Monument Street, EC3R 8AH',51.5102,-0.0865,'A 17th-century column commemorating the Great Fire, with a viewing platform.', 'londonMyMind',['art-culture','experience']],
+  ['leadenhall-market','Leadenhall Market','City of London','Gracechurch Street, EC3V 1LT',51.5127,-0.0836,'Ornate covered Victorian market with shops, cafés and a distinctive painted roof.', 'londonMyMind',['market-shopping','art-culture']],
+  ['london-stone','London Stone','City of London','111 Cannon Street, EC4N 5AR',51.5107,-0.0868,'A small but storied ancient landmark preserved on Cannon Street.', 'londonMyMind',['art-culture']],
+  ['st-pauls-cathedral','St Paul’s Cathedral','City of London','St Paul’s Churchyard, EC4M 8AD',51.5138,-0.0984,'Wren’s great cathedral, famous for its dome, crypt and Whispering Gallery.', 'londonMyMind',['art-culture']],
+  ['st-pancras-international','St Pancras International','King’s Cross','Euston Road, N1C 4QP',51.5318,-0.1261,'Grand Victorian railway station with a celebrated clock tower and Eurostar services.', 'londonMyMind',['art-culture']],
+  ['kings-cross-station','King’s Cross Station','King’s Cross','Euston Road, N1 9AL',51.5308,-0.1238,'Major rail hub beside Coal Drops Yard and the Harry Potter photo spot.', 'londonMyMind',['market-shopping']],
+  ['platform-nine-and-three-quarters','Platform 9¾','King’s Cross','King’s Cross Station, N1 9AL',51.5309,-0.1240,'Harry Potter-themed photo opportunity and shop inside King’s Cross Station.', 'londonMyMind',['family-kids','experience']],
+  ['sherlock-holmes-museum','Sherlock Holmes Museum','Marylebone','221b Baker Street, NW1 6XE',51.5238,-0.1585,'Period house museum inspired by the fictional detective’s Baker Street rooms.', 'londonMyMind',['art-culture','family-kids']],
+  ['royal-observatory','Royal Observatory Greenwich','Greenwich','Blackheath Avenue, SE10 8XJ',51.4774,0.0000,'Home of the Prime Meridian, historic telescopes and hilltop views across London.', 'londonMyMind',['art-culture','experience']],
+  ['natural-history-museum','Natural History Museum','Kensington','Cromwell Road, SW7 5BD',51.4967,-0.1764,'Free museum of the natural world, known for its grand hall and dinosaur displays.', 'tripadvisor',['art-culture','family-kids','indoor']],
+  ['victoria-and-albert-museum','V&A South Kensington','Kensington','Cromwell Road, SW7 2RL',51.4966,-0.1722,'World-leading museum of art, design and performance, with free permanent collections.', 'tripadvisor',['art-culture','indoor']],
+  ['science-museum','Science Museum','Kensington','Exhibition Road, SW7 2DD',51.4978,-0.1745,'Hands-on science museum with family galleries, engineering collections and IMAX cinema.', 'visitLondon',['art-culture','family-kids','indoor']],
+  ['sky-garden','Sky Garden','City of London','1 Sky Garden Walk, EC3M 8AF',51.5111,-0.0836,'Public indoor garden and viewing level at the top of 20 Fenchurch Street.', 'tripadvisor',['experience','indoor']],
+  ['covent-garden','Covent Garden','Covent Garden','Covent Garden Piazza, WC2E 8RF',51.5117,-0.1230,'Historic piazza for street performers, shopping, dining and theatre.', 'tripadvisor',['market-shopping','food-drink']],
+  ['shakespeares-globe','Shakespeare’s Globe','South Bank','21 New Globe Walk, SE1 9DT',51.5081,-0.0972,'Reconstructed open-air theatre with performances, exhibitions and guided tours.', 'tripadvisor',['theatre-comedy','art-culture']],
+  ['royal-albert-hall','Royal Albert Hall','Kensington','Kensington Gore, SW7 2AP',51.5009,-0.1774,'Landmark concert hall with tours and a year-round programme of performances.', 'tripadvisor',['music','art-culture']],
+  ['tate-modern','Tate Modern','South Bank','Bankside, SE1 9TG',51.5076,-0.1002,'Free modern-art museum in the former Bankside Power Station.', 'tripadvisor',['art-culture','indoor']],
+  ['tate-britain','Tate Britain','Westminster','Millbank, SW1P 4RG',51.4908,-0.1279,'National collection of British art from 1500 to the present day.', 'visitLondon',['art-culture','indoor']],
+  ['kew-gardens','Royal Botanic Gardens, Kew','Kew','Kew, TW9 3AB',51.4787,-0.2956,'World-famous botanic gardens with glasshouses, treetop walkways and broad landscapes.', 'tripadvisor',['parks-outdoors','family-kids']],
+  ['buckingham-palace','Buckingham Palace','Westminster','London, SW1A 1AA',51.5014,-0.1419,'Official London residence of the monarch, with seasonal State Rooms visits.', 'visitLondon',['art-culture','experience']],
+  ['churchill-war-rooms','Churchill War Rooms','Westminster','King Charles Street, SW1A 2AQ',51.5022,-0.1295,'Underground wartime command centre and museum dedicated to Winston Churchill.', 'visitLondon',['art-culture','indoor']],
+  ['imperial-war-museum','Imperial War Museum London','South Bank','Lambeth Road, SE1 6HZ',51.4958,-0.1081,'Museum exploring conflicts from the First World War to the present day.', 'visitLondon',['art-culture','family-kids','indoor']],
+  ['madame-tussauds','Madame Tussauds London','Marylebone','Marylebone Road, NW1 5LR',51.5230,-0.1551,'Immersive wax-figure attraction featuring film, music, sport and history icons.', 'visitLondon',['family-kids','experience','indoor']],
+  ['sea-life-london','SEA LIFE London Aquarium','South Bank','County Hall, SE1 7PB',51.5021,-0.1195,'Riverside aquarium with marine habitats, sharks, rays and family displays.', 'visitLondon',['family-kids','experience','indoor']],
+  ['kensington-palace','Kensington Palace','Kensington','Kensington Gardens, W8 4PX',51.5050,-0.1877,'Royal palace in Kensington Gardens with historic royal apartments and exhibitions.', 'tripadvisor',['art-culture','family-kids']],
+  ['zsl-london-zoo','ZSL London Zoo','Regent’s Park','Outer Circle, NW1 4RY',51.5353,-0.1534,'Regent’s Park zoo with animal habitats, talks and family-focused experiences.', 'visitLondon',['family-kids','experience','parks-outdoors']],
+  ['cutty-sark','Cutty Sark','Greenwich','King William Walk, SE10 9HT',51.4826,-0.0096,'Historic tea clipper in Greenwich, now an interactive maritime museum.', 'visitLondon',['art-culture','family-kids']],
+  ['hms-belfast','HMS Belfast','London Bridge','The Queen’s Walk, SE1 2JH',51.5065,-0.0816,'Second World War warship museum moored on the Thames near Tower Bridge.', 'visitLondon',['art-culture','family-kids']],
+  ['earls-court-police-box','Earl’s Court Police Box','Kensington','Earl’s Court Road, SW5',51.4916,-0.1933,'Blue police-box landmark and a popular Doctor Who photo stop near Earl’s Court.', 'londonMyMind',['art-culture','family-kids']],
+  ['london-telephone-boxes','Iconic Red Telephone Boxes','Westminster','Great George Street, SW1P 3AA',51.5004,-0.1288,'Classic red telephone boxes near Westminster make a quintessential London photo stop.', 'londonMyMind',['art-culture']],
+  ['shoreditch-street-art','Shoreditch Street Art','Shoreditch','Brick Lane, E1 6QL',51.5213,-0.0715,'Ever-changing murals, paste-ups and independent galleries across Shoreditch and Brick Lane.', 'londonMyMind',['art-culture','parks-outdoors']],
+  ['whitechapel-history-walk','Whitechapel History Walk','Whitechapel','Whitechapel High Street, E1 7QA',51.5169,-0.0658,'Self-guided East End walk for Victorian history, including the locations associated with Jack the Ripper.', 'londonMyMind',['art-culture','experience']]
+].map(([id,name,area,address,lat,lng,summary,sourceKey,extraCategories]) => ({id,categories:['tourist-place',...extraCategories],name,summary,area,address,lat,lng,hours:'Hours vary',open:true,indoor:extraCategories.includes('indoor'),family:extraCategories.includes('family-kids'),station:'Check TfL journey planner',price:'Varies',source:touristSources[sourceKey][0],sourceLink:touristSources[sourceKey][1],verified:`Featured in the ${touristSources[sourceKey][0]} London visitor guide; check current opening times and ticket requirements`}));
+items.push(...touristDestinations);
+const touristCompatibleCategories = new Set(['art-culture','market-shopping','parks-outdoors','experience']);
+items.forEach(item => { if(item.categories.some(category => touristCompatibleCategories.has(category)) && !item.categories.includes('tourist-place')) item.categories.push('tourist-place'); });
 const sourceStatuses = [
-  ['Curated London locations','Pins include publicly listed visitor locations plus restaurant and bar recommendations from SquareMeal, Tripadvisor, Thistle Hotels and Time Out. Always check the linked venue for current hours and tickets.','Available'],
+  ['Curated London locations','Pins include visitor destinations from London On My Mind, Tripadvisor and Visit London, plus restaurant and bar recommendations from SquareMeal, Thistle Hotels and Time Out. Always check the linked venue for current hours and tickets.','Available'],
   ['OpenStreetMap base map','© OpenStreetMap contributors. Tiles must be used within the selected provider’s policy. Retention: none.','Configured'],
   ['Live city updates','BBC London News, City of London, London City Hall, TfL and Open-Meteo are requested by the local server whenever the page opens.','Live']
 ];
