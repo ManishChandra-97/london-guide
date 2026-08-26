@@ -75,7 +75,7 @@
           <div class="map-legend" id="mapLegend" aria-label="Map legend"></div>
           <div class="map-attribution">Curated locations · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a></div>
           <section class="results-sheet" id="results" aria-label="List view of results">
-            <div class="results-sheet-heading"><div><p class="eyebrow">Map-free browsing</p><h2>Places on this map</h2></div><span class="results-sheet-count" id="mapResultCount" aria-live="polite">Loading…</span></div>
+            <div class="results-sheet-heading"><div><button class="eyebrow browse-link" id="browsePlacesButton">Map-free browsing</button><h2>Places on this map</h2></div><span class="results-sheet-count" id="mapResultCount" aria-live="polite">Loading…</span></div>
             <div class="result-list" id="resultList" aria-live="polite"><p class="result-empty">Loading places…</p></div>
           </section>
         </section>
@@ -100,6 +100,12 @@
       <ol id="itineraryList" class="itinerary-list"></ol>
       <div class="itinerary-empty" id="itineraryEmpty">Save places from their detail cards to start your day plan.</div>
       <div class="dialog-footer"><button id="clearItinerary" class="text-button">Clear plan</button><button id="exportItinerary" class="primary-button">Export day plan</button></div>
+    </dialog>
+
+    <dialog id="browseDialog" class="sources-dialog browse-dialog" aria-labelledby="browseDialogTitle">
+      <div class="dialog-top"><div><p class="eyebrow" id="browseDialogKicker">Map-free browsing</p><h2 id="browseDialogTitle">Places to explore</h2></div><button class="icon-button" data-close-dialog aria-label="Close places">×</button></div>
+      <p id="browseDialogDescription">Choose a place to see its details and travel options.</p>
+      <div class="browse-place-list" id="browsePlaceList" aria-live="polite"></div>
     </dialog>
 
     <template id="detailTemplate">
