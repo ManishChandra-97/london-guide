@@ -1,0 +1,191 @@
+# London Visitor Compass — build brief
+
+Build a responsive, map-first dashboard that helps a visitor discover London and plan a day out. The product is an **information and discovery tool**, not a booking engine. The main experience is a London map populated with interactive, category-coded location pins; selecting a pin opens a rich detail panel on the right, while filters and search sit on the left.
+
+## Product goals
+
+- Let a tourist quickly explore London by interest, date, area, price, accessibility, and opening status.
+- Make the map, time-sensitive notices, weather, and transport pointers feel current and trustworthy.
+- Use legal, documented APIs, official feeds, openly licensed datasets, or provider-approved embeds/links only. Never scrape websites, search-result pages, Google Maps, Google Weather, reviews, ticketing sites, blogs, or social networks.
+- Clearly identify data source, licence/terms, and the time each live item was last fetched.
+
+## Required layout
+
+Desktop layout is three columns below a persistent top bar:
+
+1. **Left filter rail** (280–340px, collapsible)
+   - Search input: “Search places, events, neighbourhoods”.
+   - Date selector: Today / This weekend / Custom date.
+   - Checkboxes or toggle groups for every category listed below.
+   - Filters: free/paid, price range, open now, distance/area, family-friendly, step-free/accessibility, indoor/outdoor, booking required, and “near a Tube/National Rail station”.
+   - “Clear all” and a visible result count.
+   - Saved places may be stored locally in the browser; do not require an account for the MVP.
+
+2. **Map canvas** (the central, dominant area)
+   - Start centered on Greater London with sensible bounds/zoom.
+   - Render locations as category-coloured icon pins. Cluster dense pins at lower zoom; expand them when zooming in.
+   - Hover/focus shows a small accessible preview. Click/tap selects the item, pans it into view if needed, opens the right panel, and highlights the pin.
+   - Map controls: zoom, locate me (permission-based), reset London view, legend, and a toggle for transit/stations.
+   - Support keyboard navigation and a non-map result-list fallback for screen-reader and small-screen users.
+
+3. **Right detail panel** (360–440px, drawer on smaller screens)
+   - Hero image only when the source licence/terms permit it; otherwise use a category illustration or no image.
+   - Name, category, short factual description, address/area, coordinates, opening/event time, price, accessibility notes, and source attribution.
+   - For events: date/time, venue, official organiser/ticket link, availability notice where permitted, and an “add to itinerary” control.
+   - For places: official website, directions link, nearby transport, and a “save” control.
+   - Show ratings/reviews only through an approved provider integration and with its required attribution/linking. Do not ingest or store review text from a webpage.
+   - Include a “Report stale information” link and a visible `Last checked` timestamp.
+
+On mobile, use: top ticker → compact filter/search bar → map → swipeable detail drawer/results sheet. Do not hide core filters; put them in a modal sheet.
+
+## Top status and news ticker
+
+Above the map, but below the app header, place a continuously scrolling right-to-left ticker. It must pause on hover, keyboard focus, and when `prefers-reduced-motion` is enabled; provide an explicit pause/play button.
+
+Ticker items are compact cards with an icon, timestamp, source, and outbound link. Rotate through:
+
+- latest London headlines/notices from a permitted feed;
+- TfL line status, planned works, and significant disruption alerts;
+- National Rail disruption/service notices relevant to London terminals;
+- current weather and a short forecast summary;
+- public-safety or city notices when provided by an official source.
+
+Add **Refresh news & alerts** and **Refresh weather** actions. While refreshing, preserve the last good response, show a non-blocking spinner, handle failure gracefully, and expose `Updated: 26 Aug 2026, 14:05 BST` (use the actual local timestamp and timezone returned by the feed). Do not claim data is live if the refresh fails.
+
+## Discovery categories
+
+Implement these as first-class categories, each with an icon, colour, accessible text label, filter, and pin type. This exceeds the requested five additional tourist-interest categories.
+
+| Category | Examples |
+| --- | --- |
+| Tourist places | Museums, landmarks, galleries, viewpoints |
+| Restaurants | Restaurants, cafés, bakeries |
+| Bars, pubs & street food | Pubs, cocktail bars, food markets, street-food traders |
+| Sports events | Fixtures, matches, races, sports venues |
+| Music events | Concerts, gigs, festivals, live-music venues |
+| Experiences & tours | Guided tours, theatre, workshops, river cruises |
+| Theatre & comedy | West End, fringe theatre, comedy shows |
+| Markets & shopping | Markets, independent shops, department stores |
+| Parks & outdoors | Parks, gardens, walking routes, viewpoints |
+| Family & kids | Child-friendly attractions, playgrounds, zoos, activities |
+| Art, history & culture | Exhibitions, heritage sites, cultural centres |
+| Seasonal & free events | Festivals, public events, free-entry activities |
+| Wellness & rainy-day | Spas, indoor activities, fitness and wellbeing |
+| Practical visitor services | Toilets, visitor centres, luggage storage, accessible facilities |
+
+An item can belong to more than one category. Filtering uses OR within a filter group and AND across groups; make this behaviour clear in the UI.
+
+## Data and integration policy (non-negotiable)
+
+### Allowed collection methods
+
+Use only one of the following:
+
+- A documented official API/feed and its approved authentication method.
+- An openly licensed, downloadable dataset with licence and attribution retained.
+- A provider-authorised embed, deep link, or API response displayed in accordance with that provider’s terms.
+- Editorial data entered manually from a permitted primary source, with source URL and verification date.
+
+Never automate browser extraction, HTML parsing, headless browsing, search-result harvesting, reverse-engineered APIs, or copying of reviews/photos. Do not use `robots.txt` as permission to scrape.
+
+### Preferred data sources and adapters
+
+Design each source behind a server-side adapter so clients receive a normalised response. Keep API keys server-side. Add per-source rate limiting, retry/backoff, timeout, caching only where the source terms allow it, provenance, and a circuit breaker/fallback state.
+
+| Need | Preferred source | Implementation notes |
+| --- | --- | --- |
+| Base map and points of interest | OpenStreetMap data + Leaflet or MapLibre; geocoding through a compliant hosted service or self-hosted Nominatim | Use an OSM-compatible tile provider whose usage policy permits production traffic, or host tiles. Include required OSM attribution. Do not use the public Nominatim endpoint for bulk geocoding. |
+| Core cultural/tourist data | Wikidata SPARQL, Wikimedia Commons, London Datastore, and official attraction feeds/sites | Retain Wikidata/Wikimedia licences and image attribution. Curate a small verified seed set before enabling broad imports. |
+| London transport | TfL Unified API | Use documented endpoints for line status, planned works, journey planning, arrivals, stops, cycle hire, and accessibility where available. Credit: “Powered by the Transport for London Journey Planner API” where its terms require it. |
+| National rail | National Rail Enquiries / Rail Data Marketplace official feed | Use only the registered official API/feed. Surface real-time service notices and departures only within licence limits. |
+| Events | Official venue/promoter APIs or RSS/ICS feeds; London Datastore; provider APIs where explicitly licensed | Store event source URL, timezone, start/end time, date verified, cancellation status, and licence/terms. Do not scrape GetYourGuide, Ticketmaster, Eventbrite, or venue pages. Prefer an approved partner API, approved widget, or outbound link. |
+| Restaurants, pubs, bars, street food | OpenStreetMap, official business websites, permitted directory/provider APIs, editorially verified data | For Google, use only official Maps Platform APIs/embeds and follow its current display, attribution, and caching terms. A Google Maps embed can be a directions/detail link; do not scrape Google Maps or Google reviews. |
+| Reviews | Approved Google Places integration only if a project key/billing and full compliance are available; otherwise link out to the provider | Display provider-supplied review/rating content only with all mandatory author/provider attribution and source links. Do not cache or rehost it contrary to provider terms. Default MVP: link to reviews rather than ingest them. |
+| Weather | An official, documented weather API such as Met Office DataHub, Open-Meteo, or Met Norway, subject to its licence/terms | There is no public Google Weather developer API to scrape. Do not scrape Google Weather. If Google Weather is desired, offer a clearly labelled outbound Google weather link only; use the approved weather API for the in-dashboard display. |
+| News/notices | Official public RSS/Atom feeds, London Datastore, TfL, National Rail, and publisher APIs that authorise use | Store/display only what the feed/API licence allows. Prefer headline, timestamp, source, and link; avoid republishing full article text. |
+
+The dashboard must include a **Data sources & licences** modal listing every active adapter, its licence/terms URL, attribution, current status, retention policy, and last successful fetch. If a source cannot legally support use, exclude it rather than finding an unofficial workaround.
+
+### Source links to implement against
+
+- TfL Unified API: <https://tfl.gov.uk/info-for/open-data-users/unified-api>
+- TfL API documentation: <https://api.tfl.gov.uk/swagger/ui/index.html>
+- National Rail developer information: <https://www.nationalrail.co.uk/developers/>
+- London Datastore: <https://data.london.gov.uk/>
+- OpenStreetMap copyright/attribution: <https://www.openstreetmap.org/copyright>
+- Google Places policy and attribution requirements: <https://developers.google.com/maps/documentation/places/web-service/policies>
+
+Before production, recheck each source’s current licence, pricing, quota, geographic restrictions, attribution, caching, and display terms. “Open source” software does not automatically make every external dataset open data.
+
+## Data model
+
+Use a normalised `DiscoverableItem` model. Keep provider-specific payloads out of the client and retain no more data than permitted.
+
+```ts
+type Category =
+  | 'tourist-place' | 'restaurant' | 'food-drink' | 'sports' | 'music'
+  | 'experience' | 'theatre-comedy' | 'market-shopping' | 'parks-outdoors'
+  | 'family-kids' | 'art-culture' | 'seasonal-free' | 'wellness-indoor'
+  | 'visitor-services';
+
+interface DiscoverableItem {
+  id: string;
+  source: { name: string; url: string; licenceUrl?: string; externalId?: string };
+  categories: Category[];
+  name: string;
+  summary?: string;
+  location: { latitude: number; longitude: number; address?: string; borough?: string };
+  hours?: { status?: 'open' | 'closed' | 'unknown'; text?: string; verifiedAt?: string };
+  event?: { startsAt: string; endsAt?: string; timezone: 'Europe/London'; venue?: string; status?: 'scheduled' | 'cancelled' | 'postponed' };
+  price?: { currency: 'GBP'; min?: number; max?: number; isFree?: boolean; text?: string };
+  accessibility?: string[];
+  officialUrl?: string;
+  bookingUrl?: string;
+  image?: { url: string; alt: string; attribution: string; licenceUrl?: string };
+  lastVerifiedAt: string;
+}
+```
+
+Also define `TransportAlert`, `WeatherSnapshot`, `NewsItem`, and `SourceStatus` models. Every record shown to a visitor needs a source URL and either `lastVerifiedAt` or its feed timestamp.
+
+## Map, transport, and itinerary behaviour
+
+- Use OpenStreetMap + Leaflet/MapLibre for a free/open default map implementation. Do not mix Google Places content with a non-Google map when Google’s terms prohibit it; use a compliant Google Map/Places implementation or keep Google data in a separate link/embed flow.
+- On a selected item, show nearby TfL stations/stops and a compact “Plan with TfL” link. For national terminals/services, use the authorised National Rail link/feed.
+- Generate directions with an external, attributed route/deep link unless routing data is separately licensed.
+- Add itinerary controls: save, remove, reorder, and export a simple day plan. Local-only storage is sufficient for MVP; explain that saved plans remain on this device.
+- Event times must be stored/rendered in `Europe/London` and correctly handle BST/GMT.
+
+## Visual system
+
+- Mood: polished, colourful, contemporary London travel guide—use a restrained dark navy/cream base with bright category accents, not a generic admin dashboard.
+- Map has visual priority. Filters and detail panel should feel like frosted, high-contrast surfaces above/beside it, while preserving WCAG contrast.
+- Include loading skeletons, empty states (“No events match these filters”), offline/source-unavailable states, and an uncluttered first-run state.
+- Do not use real logos, copyrighted photos, ratings, editorial copy, or booking claims in mock data unless their licence/permission is clear. Use clearly labelled fictional/demo content until an approved source is connected.
+
+## Accessibility, privacy, and security
+
+- Meet WCAG 2.2 AA: keyboard-operable filters and map alternatives, visible focus, labels, semantic landmarks, screen-reader announcements when a selection changes, and non-colour category indicators.
+- Respect `prefers-reduced-motion`; the ticker and map animation must be optional/reduced.
+- Ask permission before using location. Process location locally for nearby sorting where possible; do not persist precise location without explicit consent.
+- Do not expose API keys, personal data, or provider raw payloads to the browser. Use server-side environment variables and a documented `.env.example` with placeholder names only.
+- Publish a privacy notice and terms page before deploying any third-party map, weather, analytics, review, or booking integrations.
+
+## Build sequence
+
+1. Build the responsive shell, map, filters, category legend, selected-item panel, keyboard flow, and a local fixture adapter with clearly labelled fictional data.
+2. Add the normalised backend API and source-status/provenance UI.
+3. Integrate TfL line status/nearby transport through its official API, then the approved weather source and refresh timestamps.
+4. Add compliant open-data POIs and official event feeds one adapter at a time. Build source-specific tests and attribution before enabling each adapter.
+5. Add National Rail and any paid/partner provider integrations only after credentials, licensing, and display rules are configured.
+6. Test responsive layout, accessibility, error handling, rate limits, date/time handling, stale-cache behaviour, and pin performance with clustering.
+
+## Definition of done
+
+- The dashboard displays all 14 categories above on an interactive London map and can filter/search them.
+- Clicking a pin opens the corresponding fully sourced right-hand detail view; the same information is available without map interaction.
+- The live ticker has accessible pause/refresh behaviour and shows truthful timestamps for weather, news, and alerts.
+- Weather/news refresh actions show last successful update and an error state without blanking existing data.
+- TfL/National Rail pointers use their official documented channels; no illegal scraping is present.
+- Every production data source is documented in the in-product source/licence modal, including attribution and retention/caching treatment.
+- The repository includes setup instructions, environment variable names, fixture mode, integration tests for normalisation, and a short compliance checklist.

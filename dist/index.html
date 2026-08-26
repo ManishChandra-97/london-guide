@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="London Visitor Compass — a live London discovery dashboard." />
+    <title>London Visitor Compass</title>
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#results">Skip to results</a>
+    <div class="app-shell">
+      <header class="app-header">
+        <a class="brand" href="#" aria-label="London Visitor Compass home">
+          <span class="brand-mark" aria-hidden="true">⌁</span>
+          <span><strong>London</strong> Visitor Compass</span>
+        </a>
+        <nav class="header-actions" aria-label="Utility navigation">
+          <button class="text-button" id="sourcesButton">Data sources <span aria-hidden="true">↗</span></button>
+          <button class="itinerary-button" id="itineraryButton"><span aria-hidden="true">✦</span> My day <b id="savedCount">0</b></button>
+          <button class="menu-button" id="mobileFiltersButton" aria-controls="filters" aria-expanded="false"><span aria-hidden="true">☷</span><span>Filters</span></button>
+        </nav>
+      </header>
+
+      <section class="ticker-bar" aria-label="London updates">
+        <div class="ticker-label"><span class="pulse" aria-hidden="true"></span> City pulse</div>
+        <div class="ticker-viewport" tabindex="0" aria-label="Latest London notices. Hover or focus to pause.">
+          <div class="ticker-track" id="tickerTrack"></div>
+        </div>
+        <button class="icon-button ticker-control" id="tickerControl" aria-label="Pause updates" title="Pause updates">Ⅱ</button>
+        <button class="refresh-button" id="refreshAlerts"><span aria-hidden="true">↻</span> Refresh</button>
+      </section>
+
+      <main class="dashboard">
+        <aside class="filter-rail" id="filters" aria-label="Discover London filters">
+          <div class="rail-heading">
+            <div><p class="eyebrow">Explore London</p><h1>Find your next <em>good story.</em></h1></div>
+            <button class="close-mobile" id="closeFilters" aria-label="Close filters">×</button>
+          </div>
+          <label class="search-box" for="searchInput"><span aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="Search places, events, neighbourhoods" /></label>
+          <div class="date-selector" role="group" aria-label="Choose date">
+            <button class="active" data-date="today">Today</button><button data-date="weekend">This weekend</button><button data-date="custom">Custom</button>
+            <label class="custom-date" id="customDateControl" hidden>Event date <input id="customDate" type="date" /></label>
+          </div>
+          <div class="filter-toolbar"><span id="resultCount" aria-live="polite">14 places</span><button id="clearFilters">Clear all</button></div>
+          <section class="filter-section">
+            <div class="section-heading"><h2>What calls to you?</h2><span>OR</span></div>
+            <div class="category-options" id="categoryOptions"></div>
+          </section>
+          <section class="filter-section quick-filters">
+            <div class="section-heading"><h2>Make it yours</h2><span>AND</span></div>
+            <label><input type="checkbox" data-filter="free" /> <span>Free entry</span></label>
+            <label><input type="checkbox" data-filter="open" /> <span>Open now</span></label>
+            <label><input type="checkbox" data-filter="family" /> <span>Family-friendly</span></label>
+            <label><input type="checkbox" data-filter="stepfree" /> <span>Step-free access</span></label>
+            <label><input type="checkbox" data-filter="indoor" /> <span>Indoor</span></label>
+            <label><input type="checkbox" data-filter="station" /> <span>Near a station</span></label>
+          </section>
+          <section class="filter-section area-filter">
+            <label for="areaSelect">Area</label>
+            <select id="areaSelect"><option value="">All London</option><option>Westminster</option><option>South Bank</option><option>Shoreditch</option><option>Greenwich</option><option>Camden</option><option>Kensington</option></select>
+          </section>
+          <p class="filter-note"><span aria-hidden="true">ⓘ</span> Categories combine with <b>OR</b>; other filters with <b>AND</b>.</p>
+        </aside>
+
+        <section class="map-column" aria-label="London discovery map">
+          <div class="map-topline">
+            <div class="location-crumb"><span aria-hidden="true">⌖</span> Greater London <button id="resetMap">Reset view</button></div>
+            <div class="map-actions"><button id="stationToggle" class="compact-button" aria-pressed="true">Ⓜ Stations</button><button id="locateButton" class="compact-button">◎ Locate me</button></div>
+          </div>
+          <div id="map" role="application" aria-label="Interactive map of London places"></div>
+          <div class="plan-map-notice" id="planMapNotice" hidden><span>✦</span><strong>Saved plan on the map</strong><button id="returnToFilters">Return to filters</button></div>
+          <div class="map-legend" id="mapLegend" aria-label="Map legend"></div>
+          <div class="map-attribution">Curated locations · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a></div>
+          <section class="results-sheet" id="results" aria-label="List view of results">
+            <div class="results-sheet-heading"><p class="eyebrow">Map-free browsing</p><h2>Places on this map</h2></div>
+            <div class="result-list" id="resultList"></div>
+          </section>
+        </section>
+
+        <aside class="detail-panel" id="detailPanel" aria-live="polite" aria-label="Selected place details">
+          <div class="empty-detail" id="emptyDetail"><div class="compass-illustration" aria-hidden="true">⌘</div><p class="eyebrow">Start exploring</p><h2>A London day, <em>your way.</em></h2><p>Choose a pin or a place in the list for opening times, travel pointers, and trusted source information.</p><div class="detail-tip"><span aria-hidden="true">⌘</span> Tip: save a few spots to build a simple day plan.</div></div>
+          <article id="detailContent" hidden></article>
+        </aside>
+      </main>
+    </div>
+
+    <dialog id="sourcesDialog" class="sources-dialog">
+      <div class="dialog-top"><div><p class="eyebrow">Trust centre</p><h2>Data sources & licences</h2></div><button class="icon-button" data-close-dialog aria-label="Close data sources">×</button></div>
+          <p>Live news, events, travel status and weather are requested through the local server when the page opens or you press Refresh. Restaurant, pub and bar pins are selected from SquareMeal, Tripadvisor, Thistle Hotels and Time Out listings; each detail card links back to its source. Check the venue for current hours and booking availability.</p>
+      <div class="source-list" id="sourceList"></div>
+      <a class="dialog-link" href="https://tfl.gov.uk/info-for/open-data-users/unified-api" target="_blank" rel="noreferrer">TfL Unified API guidance ↗</a>
+    </dialog>
+
+    <dialog id="itineraryDialog" class="sources-dialog itinerary-dialog">
+      <div class="dialog-top"><div><p class="eyebrow">Saved on this device</p><h2>My London day</h2></div><button class="icon-button" data-close-dialog aria-label="Close itinerary">×</button></div>
+      <p class="itinerary-intro">Your saved plan stays in this browser. Drag-free ordering controls make quick planning easy.</p>
+      <ol id="itineraryList" class="itinerary-list"></ol>
+      <div class="itinerary-empty" id="itineraryEmpty">Save places from their detail cards to start your day plan.</div>
+      <div class="dialog-footer"><button id="clearItinerary" class="text-button">Clear plan</button><button id="exportItinerary" class="primary-button">Export day plan</button></div>
+    </dialog>
+
+    <template id="detailTemplate">
+      <div class="detail-hero"><div class="hero-shape"></div><button class="icon-button close-detail" aria-label="Close place details">×</button><span class="detail-category"></span><span class="hero-icon"></span></div>
+      <div class="detail-body"><div class="detail-title-row"><div><p class="detail-kicker"></p><h2></h2></div><button class="save-round" aria-label="Save place">♡</button></div><p class="detail-summary"></p><div class="status-line"></div><dl class="fact-list"></dl><div class="detail-actions"></div><div class="nearby-station"></div><div class="provenance"></div></div>
+    </template>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="app.js"></script>
+  </body>
+</html>
