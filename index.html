@@ -44,7 +44,7 @@
             <button class="active" data-date="today">Today</button><button data-date="weekend">This weekend</button><button data-date="custom">Custom</button>
             <label class="custom-date" id="customDateControl" hidden>Event date <input id="customDate" type="date" /></label>
           </div>
-          <div class="filter-toolbar"><span id="resultCount" aria-live="polite">14 places</span><button id="clearFilters">Clear all</button></div>
+          <div class="filter-toolbar"><span id="resultCount" aria-live="polite">Loading places…</span><button id="clearFilters">Clear all</button></div>
           <section class="filter-section">
             <div class="section-heading"><h2>What calls to you?</h2><span>OR</span></div>
             <div class="category-options" id="categoryOptions"></div>
@@ -75,8 +75,8 @@
           <div class="map-legend" id="mapLegend" aria-label="Map legend"></div>
           <div class="map-attribution">Curated locations · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a></div>
           <section class="results-sheet" id="results" aria-label="List view of results">
-            <div class="results-sheet-heading"><p class="eyebrow">Map-free browsing</p><h2>Places on this map</h2></div>
-            <div class="result-list" id="resultList"></div>
+            <div class="results-sheet-heading"><div><p class="eyebrow">Map-free browsing</p><h2>Places on this map</h2></div><span class="results-sheet-count" id="mapResultCount" aria-live="polite">Loading…</span></div>
+            <div class="result-list" id="resultList" aria-live="polite"><p class="result-empty">Loading places…</p></div>
           </section>
         </section>
 
