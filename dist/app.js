@@ -125,7 +125,7 @@ async function loadLiveUpdates(force=false) {
     renderTicker(payload.updates || []); renderSources(payload.updatedAt || 'just now');
     button.innerHTML=`<span aria-hidden="true">↻</span> Updated ${payload.updatedAt || 'just now'}`;
   } catch (error) {
-    renderTicker([{type:'!',source:'Updates unavailable',text:'Unable to reach the local live-update service. Start the app with npm start, then refresh.',url:'#',time:'Now'}]);
+    renderTicker([{type:'!',source:'Updates unavailable',text:'Live updates are temporarily unavailable. Please try again shortly.',url:'#',time:'Now'}]);
     button.innerHTML='<span aria-hidden="true">↻</span> Retry updates';
   } finally { button.classList.remove('loading'); button.disabled=false; }
 }
